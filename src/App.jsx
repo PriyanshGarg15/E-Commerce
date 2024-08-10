@@ -4,9 +4,9 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
-import Admin from './Components/Admin'
-
-
+import NotFound from './Components/NotFound';
+import Products from './Components/Admin/product'
+import Orders from './Components/Admin/order'
 
 const App = () =>
 {
@@ -14,7 +14,11 @@ const App = () =>
     <div>
       <Router>
         <Routes>
-          <Route  path='/admin' element={<Admin/>}/>
+          <Route path='/admin'>
+            <Route path='products'element={<Products/>}/>
+            <Route path='orders'element={<Orders/>}/>
+          </Route>
+          <Route path='*' element={<NotFound/>}/>
         </Routes>
       </Router>
     </div>

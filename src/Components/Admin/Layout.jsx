@@ -1,5 +1,5 @@
 import { useState } from "react"
-const Admin = () =>{
+const Admin = ({children}) =>{
     const[size,setSize]=useState(280)
     const[accountMenu,setAccountmenu]=useState(false)
     return(
@@ -18,7 +18,7 @@ const Admin = () =>{
                     transition:'0.3s'
                 }}
             >
-                <nav className="bg-white p-6 shadow flex items-center justify-between" >
+                <nav className="bg-white p-6 shadow flex items-center justify-between sticky top-0" >
                     <div className="flex gap-4 items-center">
                         <button 
                             onClick={()=>setSize(size===280?0:280)}
@@ -31,7 +31,7 @@ const Admin = () =>{
 
                     <div>
                         <button className="relative">
-                            <img src="./images/avtar.png" className="w-10 h-10 rounded-full" alt="" onClick={()=>setAccountmenu(!accountMenu)}/>
+                            <img src="/images/avtar.png" className="w-10 h-10 rounded-full" alt="" onClick={()=>setAccountmenu(!accountMenu)}/>
                             {
                                 accountMenu && 
                                 <div className="absolute top-18 right-0 bg-white shadow-lg w-[200px] p-6">
@@ -50,6 +50,9 @@ const Admin = () =>{
                         </button>
                     </div>
                 </nav>
+                <div className="p-6">
+                    {children}
+                </div>
             </section>
         </div>
     )
