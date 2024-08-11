@@ -11,6 +11,11 @@ const Admin = ({children}) =>{
             link:'/admin/dashboard'
         },
         {
+            label:'Customers',
+            icon: <i className="ri-user-line mr-2"></i>,
+            link:'/admin/customers'
+        },
+        {
             label:'Products',
             icon: <i className="ri-shopping-cart-fill mr-2"></i>,
             link:'/admin/products'
@@ -29,11 +34,6 @@ const Admin = ({children}) =>{
             label:'Settings',
             icon: <i className="ri-settings-2-line mr-2"></i>,
             link:'/admin/settings'
-        },
-        {
-            label:'Logout',
-            icon: <i className="ri-logout-circle-r-line mr-2"></i>,
-            link:'/admin/logout'
         }
     ]
     const location=useLocation()
@@ -48,23 +48,29 @@ const Admin = ({children}) =>{
                     }}
                 >
                     <div className="flex flex-col">
-                    {
-                            menus.map((item,index)=>(
-                                <Link 
-                                    
-                                    to={item.link}
-                                    className="px-4 py-3 text-gray-50 text-[17.5px] 
-                                    hover:bg-rose-600 hover:text-white" 
-                                    key={index}
-                                    style={{
-                                        background:(location.pathname===item.link)?"#E11D48":"transparent"
-                                    }}
-                                >
-                                    {item.icon}
-                                    {item.label}
-                                </Link>
-                            ))
-                    }
+                        {
+                                menus.map((item,index)=>(
+                                    <Link 
+                                        
+                                        to={item.link}
+                                        className="px-4 py-3 text-gray-50 text-[17.5px] 
+                                        hover:bg-rose-600 hover:text-white" 
+                                        key={index}
+                                        style={{
+                                            background:(location.pathname===item.link)?"#E11D48":"transparent"
+                                        }}
+                                    >
+                                        {item.icon}
+                                        {item.label}
+                                    </Link>
+                                ))
+                        }
+                        <button className="px-4 py-3 text-gray-50 text-[17.5px] 
+                                        hover:bg-rose-600 hover:text-white text-left" >
+                            <i className="ri-logout-circle-r-line mr-2"></i>
+                            Logout
+                        </button>
+
                     </div> 
                 </aside>
                 <section 
@@ -142,7 +148,13 @@ const Admin = ({children}) =>{
                                 {item.label}
                             </Link>
                         ))
+                        
                 }
+                <button className="px-4 py-3 text-gray-50 text-[17.5px] 
+                                        hover:bg-rose-600 hover:text-white text-left" >
+                            <i className="ri-logout-circle-r-line mr-2"></i>
+                            Logout
+                        </button>
                 </div> 
             </aside>
             <section 
