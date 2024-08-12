@@ -13,7 +13,9 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0",
-    "remixicon": "^4.3.0"
+    "remixicon": "^4.3.0",
+    "shopcode": "file:",
+    "swiper": "^11.1.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",

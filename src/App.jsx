@@ -11,6 +11,7 @@ import Settings from './Components/Admin/Settings';
 import Payments from './Components/Admin/Payments';
 import Customers from './Components/Admin/Customers';
 import Orders from './Components/Admin/order'
+import Home from './Components/Home';
 
 const App = () =>
 {
@@ -18,6 +19,7 @@ const App = () =>
     <div>
       <Router>
         <Routes>
+          <Route path='/' element={<Home/>}/>
           <Route path='/admin'>
             <Route path='products'element={<Products/>}/>
             <Route path='orders'element={<Orders/>}/>
