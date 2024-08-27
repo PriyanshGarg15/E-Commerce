@@ -4,14 +4,20 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
+import 'animate.css';
 import NotFound from './Components/NotFound';
 import Products from './Components/Admin/product'
+import Product from './Components/product'
 import Dashboard from './Components/Admin/Dashboard';
 import Settings from './Components/Admin/Settings';
 import Payments from './Components/Admin/Payments';
 import Customers from './Components/Admin/Customers';
 import Orders from './Components/Admin/order'
 import Home from './Components/Home';
+import Category from './Components/Category';
+import Login from './Components/Login';
+import Signup from './Components/Signup';
+import Contact from './Components/contact';
 
 const App = () =>
 {
@@ -20,6 +26,11 @@ const App = () =>
       <Router>
         <Routes>
           <Route path='/' element={<Home/>}/>
+          <Route path='/products' element={<Product/>}/>
+          <Route path='/category' element={<Category/>}/>
+          <Route path='/login' element={<Login/>}/>
+          <Route path='/signup' element={<Signup/>}/>
+          <Route path='/contact-us' element={<Contact/>}/>
           <Route path='/admin'>
             <Route path='products'element={<Products/>}/>
             <Route path='orders'element={<Orders/>}/>
