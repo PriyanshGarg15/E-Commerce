@@ -12,6 +12,7 @@ const Signup = () => {
     const navigate=useNavigate()
     const [passwordType,setPasswordType] =useState("password")
     const [error,setError]=useState(null)
+    const[loader,setLoader] = useState(false)
     const [formValue,serformValue] = useState({
         fullname:'',
         email:'',
@@ -20,12 +21,16 @@ const Signup = () => {
     const signup= async(e) =>{
         try{
             e.preventDefault();
+            setLoader(true)
             await createUserWithEmailAndPassword(auth,formValue.email,formValue.password)
             navigate('/')
         }
         catch(err)
         {
             setError(err.message)
+        }
+        finally {  //koi aisa kam jo try ke bad bhi ho aur catch ke bad bhi ho !
+            setLoader(false)
         }
         
     }
@@ -74,7 +79,13 @@ const Signup = () => {
                         </button>
                     </div>
 
-                    <button className="py-3 px-8 rounded p-3 bg-blue-600 text-white font-semibold hover:bg-rose-600">SignUp</button>
+                    {
+                        loader ? <h1 className="text-lg font-semibold text-gray-600">Loading.....</h1>:
+                        <button className="py-3 px-8 rounded p-3 bg-blue-600 text-white font-semibold hover:bg-rose-600">SignUp</button>
+                    
+                    }
+                    
+                   
                 </form>
                 <div>
                     Already have an account? <Link to="/login" className="font-semibold text-blue-600">Signin</Link> 

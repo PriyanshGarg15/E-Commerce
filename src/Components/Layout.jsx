@@ -1,9 +1,30 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Link} from "react-router-dom"
+import { useEffect } from "react"
+import { getAuth,onAuthStateChanged } from "firebase/auth"
+import firebaseAppConfig from "../util/firebase-config"
+const auth=getAuth()
+
 const Layout = ({children}) =>{
+
     const[open,setopen]=useState(false)
     const navigate=useNavigate()
+
+    const [session,setSession] = useState(null)
+
+    useEffect(()=>{
+        onAuthStateChanged(auth,(user)=>{
+            if(user)
+            {
+                setSession(user)
+            }
+            else{
+                setSession(false)
+            }
+        })
+    },[])
+
     const menus=[
         {
             label:"Home",
@@ -25,8 +46,10 @@ const Layout = ({children}) =>{
 
     const mobileLink= (href)=>{
         navigate(href)
+        setopen(false)
     }
 
+    
 
     return (
         <div>
@@ -50,8 +73,21 @@ const Layout = ({children}) =>{
                                 </li>
                             ))
                         }
-                        <Link to="/login" className="block py-8 text-center hover:bg-blue-600 w-[100px] hover:text-white">Login</Link>
-                        <Link to="/signup" className="bg-blue-600 text-white text-md font-semibold block text-center py-3 hover:bg-rose-600 px-10 hover:text-white">Signup</Link>
+                        {
+                            !session && 
+                            <>
+                                <Link to="/login" className="block py-8 text-center hover:bg-blue-600 w-[100px] hover:text-white">Login</Link>
+                                <Link to="/signup" className="bg-blue-600 text-white text-md font-semibold block text-center py-3 hover:bg-rose-600 px-10 hover:text-white">Signup</Link>
+                            </>
+                           
+                        }
+
+                        {
+                            session &&
+                            <h1>Hi User Welcome !</h1>
+                            
+                        }
+                       
                     </ul>
                 </div>
             </nav>
