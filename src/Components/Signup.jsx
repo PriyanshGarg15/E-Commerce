@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import firebaseAppConfig from "../util/firebase-config"
 import { getAuth,createUserWithEmailAndPassword } from "firebase/auth"
 
@@ -8,7 +9,9 @@ const auth=getAuth(firebaseAppConfig)
 
 
 const Signup = () => {
+    const navigate=useNavigate()
     const [passwordType,setPasswordType] =useState("password")
+    const [error,setError]=useState(null)
     const [formValue,serformValue] = useState({
         fullname:'',
         email:'',
@@ -17,12 +20,12 @@ const Signup = () => {
     const signup= async(e) =>{
         try{
             e.preventDefault();
-        const user=await createUserWithEmailAndPassword(auth,formValue.email,formValue.password)
-        console.log(user)
+            await createUserWithEmailAndPassword(auth,formValue.email,formValue.password)
+            navigate('/')
         }
         catch(err)
         {
-            console.log(err)
+            setError(err.message)
         }
         
     }
@@ -34,6 +37,7 @@ const Signup = () => {
             ...formValue,
            [name]:value
         })
+        setError(null)
     }
     return(
         <div className="grid md:grid-cols-2 md:h-screen md:overflow-hidden animate__animated animate__fadeIn">
@@ -75,6 +79,17 @@ const Signup = () => {
                 <div>
                     Already have an account? <Link to="/login" className="font-semibold text-blue-600">Signin</Link> 
                 </div>
+
+
+                {
+                    error && <div className="flex justify-between items-center mt-2 bg-rose-600 p-3 rounded shadow text-white font-semibold animate__animated animate__pulse">
+                        <p>{error}</p>
+                        <button onClick={()=>setError(null)}>
+                            <i className="ri-close-line"></i>
+                        </button>
+                    </div>
+                }
+                
             </div>
             
         </div>
