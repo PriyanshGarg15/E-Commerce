@@ -2,13 +2,14 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Link} from "react-router-dom"
 import { useEffect } from "react"
-import { getAuth,onAuthStateChanged } from "firebase/auth"
+import { getAuth,onAuthStateChanged, signOut } from "firebase/auth"
 import firebaseAppConfig from "../util/firebase-config"
 const auth=getAuth()
 
 const Layout = ({children}) =>{
 
     const[open,setopen]=useState(false)
+    const[account,setAccoutnMenu]=useState(false)
     const navigate=useNavigate()
 
     const [session,setSession] = useState(null)
@@ -23,6 +24,7 @@ const Layout = ({children}) =>{
                 setSession(false)
             }
         })
+
     },[])
 
     const menus=[
@@ -49,7 +51,25 @@ const Layout = ({children}) =>{
         setopen(false)
     }
 
+    if (session == null)
+        return (
+            <div className="bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 h-full fixed top-0 left-0 w-full flex flex-col items-center justify-center">
+                <svg className="animate-spin h-10 w-10 text-rose-600 mb-4" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                </svg>
+                <p className="text-rose-600 text-lg font-semibold">Loading...</p>
+            </div>
+        )
     
+    
+    
+
+
+
+
+
+
 
     return (
         <div>
@@ -84,7 +104,25 @@ const Layout = ({children}) =>{
 
                         {
                             session &&
-                            <h1>Hi User Welcome !</h1>
+                            <button className="relative" onClick={()=>setAccoutnMenu(!account)}>
+                                <img src="/images/avtar.png" alt="" className="w-12 h-10 rounded-full" />
+                                {
+                                    account &&
+                                    <div className="animate__animated animate__fadeIn w-[150px] bg-white absolute top-12 right-0 shadow-xl flex flex-col items-start py-2">
+                                        
+                                        <Link to="/profile" className="w-full text-left px-3 py-2 hover:bg-gray-100"><i className="ri-user-line mr-2"></i>
+                                        My Profile</Link>
+                                        
+                                        <Link to="/cart" className="w-full text-left px-3 py-2hover:bg-gray-100"><i className="ri-shopping-cart-line mr-2"></i>Cart</Link>
+
+                                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100">
+                                        <i className="ri-logout-circle-r-line mr-2" onClick={()=>signOut}></i>
+                                            Logout
+                                        </button>
+                                    </div>
+                                }
+                                
+                            </button>
                             
                         }
                        

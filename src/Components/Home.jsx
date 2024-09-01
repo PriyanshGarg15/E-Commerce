@@ -87,6 +87,7 @@ const Home = () =>{
              <div>
                 <header>
                 <Swiper
+                className="z-[-1]"
                     pagination={true}
                     Navigation={true} modules={[Navigation,Pagination]} slidesPerView={1} 
                     >
