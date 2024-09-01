@@ -115,10 +115,14 @@ const Layout = ({children}) =>{
                                         
                                         <Link to="/cart" className="w-full text-left px-3 py-2hover:bg-gray-100"><i className="ri-shopping-cart-line mr-2"></i>Cart</Link>
 
-                                        <button className="w-full text-left px-3 py-2 hover:bg-gray-100">
-                                        <i className="ri-logout-circle-r-line mr-2" onClick={()=>signOut}></i>
+                                        <button 
+                                            className="w-full text-left px-3 py-2 hover:bg-gray-100" 
+                                            onClick={() => signOut(auth)}
+                                        >
+                                            <i className="ri-logout-circle-r-line mr-2"></i>
                                             Logout
                                         </button>
+
                                     </div>
                                 }
                                 
