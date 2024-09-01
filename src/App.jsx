@@ -19,7 +19,8 @@ import Login from './Components/Login';
 import Signup from './Components/Signup';
 import Contact from './Components/contact';
 import Preguard from './Components/Guard/Preguard';
-
+import Cart from './Components/Cart';
+import Profile from './Components/Profile'
 const App = () =>
 {
   return (
@@ -29,7 +30,8 @@ const App = () =>
           <Route path='/' element={<Home/>}/>
           <Route path='/products' element={<Product/>}/>
           <Route path='/category' element={<Category/>}/>
-
+          <Route path='/cart' element={<Cart/>}></Route>
+          <Route path='/profile' element={<Profile/>}></Route>
           
           <Route element={<Preguard/>}>
             <Route path='/login' element={<Login/>}/>
