@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import firebaseAppConfig from "../util/firebase-config"
 import { getAuth,createUserWithEmailAndPassword } from "firebase/auth"
+import { updateProfile } from "firebase/auth"
 
 
 const auth=getAuth(firebaseAppConfig)
@@ -23,6 +24,7 @@ const Signup = () => {
             e.preventDefault();
             setLoader(true)
             await createUserWithEmailAndPassword(auth,formValue.email,formValue.password)
+            await updateProfile(auth.currentUser,{displayName:formValue.fullname})
             navigate('/')
         }
         catch(err)

@@ -27,6 +27,8 @@ const Layout = ({children}) =>{
 
     },[])
 
+    
+
     const menus=[
         {
             label:"Home",
@@ -109,7 +111,7 @@ const Layout = ({children}) =>{
                                 {
                                     account &&
                                     <div className="animate__animated animate__fadeIn w-[150px] bg-white absolute top-12 right-0 shadow-xl flex flex-col items-start py-2">
-                                        
+                                        <p>{session.displayName}</p>
                                         <Link to="/profile" className="w-full text-left px-3 py-2 hover:bg-gray-100"><i className="ri-user-line mr-2"></i>
                                         My Profile</Link>
                                         
