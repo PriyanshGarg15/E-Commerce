@@ -17,6 +17,7 @@
     "react-router-dom": "^6.26.0",
     "remixicon": "^4.3.0",
     "shopcode": "file:",
+    "sweetalert2": "^11.13.1",
     "swiper": "^11.1.9"
   },
   "devDependencies": {

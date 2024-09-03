@@ -75,7 +75,7 @@ const Layout = ({children}) =>{
 
     return (
         <div>
-            <nav className="sticky top-0 left-0 shadow-lg bg-white">
+            <nav className="sticky top-0 left-0 shadow-lg bg-white z-[50]">
                 <div className="w-10/12  mx-auto flex items-center justify-between">
                     <img 
                         src="/images/logo.png" 
@@ -107,11 +107,11 @@ const Layout = ({children}) =>{
                         {
                             session &&
                             <button className="relative" onClick={()=>setAccoutnMenu(!account)}>
-                                <img src="/images/avtar.png" alt="" className="w-12 h-10 rounded-full" />
+                                <img src={session.photoURL?session.photoURL:"/images/avtar.png"} alt="" className="w-12 h-10 rounded-full" />
                                 {
                                     account &&
                                     <div className="animate__animated animate__fadeIn w-[150px] bg-white absolute top-12 right-0 shadow-xl flex flex-col items-start py-2">
-                                        <p>{session.displayName}</p>
+                                        
                                         <Link to="/profile" className="w-full text-left px-3 py-2 hover:bg-gray-100"><i className="ri-user-line mr-2"></i>
                                         My Profile</Link>
                                         
@@ -208,6 +208,42 @@ const Layout = ({children}) =>{
             }
             >
                 <div className="flex flex-col p-8 gap-6">
+                    {
+                        session &&
+                        <button className="relative" onClick={()=>setAccoutnMenu(!account)}>
+                            <div className="flex items-center gap-3">
+                                <img src={session.photoURL?session.photoURL:"/images/avtar.png"} alt="" className="w-12 h-10 rounded-full" />
+                                <div>
+                                    <p className="text-white capitalize
+                                    text-left">{session.displayName}</p>
+                                    <p className="text-white break-all">{session.email}</p>
+                                </div>
+                                
+                            </div>
+                           
+                            {
+                                account &&
+                                <div className="animate__animated animate__fadeIn w-[150px] bg-white absolute top-12 right-0 shadow-xl flex flex-col items-start py-2">
+                                    
+                                    <Link to="/profile" className="w-full text-left px-3 py-2 hover:bg-gray-100"><i className="ri-user-line mr-2"></i>
+                                    My Profile</Link>
+                                    
+                                    <Link to="/cart" className="w-full text-left px-3 py-2hover:bg-gray-100"><i className="ri-shopping-cart-line mr-2"></i>Cart</Link>
+
+                                    <button 
+                                        className="w-full text-left px-3 py-2 hover:bg-gray-100" 
+                                        onClick={() => signOut(auth)}
+                                    >
+                                        <i className="ri-logout-circle-r-line mr-2"></i>
+                                        Logout
+                                    </button>
+
+                                </div>
+                            }
+                            
+                        </button>
+                        
+                    }
                     {
                         menus.map((item,index)=>(
                             <button key={index} onClick={() => mobileLink(item.href)} className="text-white">{item.label}</button>
