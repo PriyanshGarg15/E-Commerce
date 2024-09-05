@@ -1,213 +1,322 @@
-import { useEffect, useState } from "react"
-import firebaseAppConfig from "firebase/compat/app"
-import { onAuthStateChanged, getAuth, updateProfile } from "firebase/auth"
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
-import { useNavigate } from "react-router-dom"
-import Layout from "./Layout"
-import Swal from "sweetalert2"
+import { useEffect, useState } from 'react'
+import firebaseAppConfig from '../util/firebase-config'
+import { onAuthStateChanged, getAuth, updateProfile } from 'firebase/auth'
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { useNavigate } from 'react-router-dom'
+import { getFirestore, addDoc, collection, getDocs, query, where, updateDoc } from 'firebase/firestore'
+import Layout from './Layout'
+import Swal from 'sweetalert2'
 
-const auth = getAuth()
+const auth = getAuth(firebaseAppConfig)
+const db = getFirestore(firebaseAppConfig)
 const storage = getStorage()
 
-const Profile = () => {
-    const [uploading,setUploading]=useState(false)
+const Profile = ()=>{
+    const [uploading, setUploading] = useState(false)
     const navigate = useNavigate()
     const [session, setSession] = useState(null)
-   
-    const [formvalue, setFormvalue] = useState({
-        fullname:'',
+    const [formValue, setFormValue] = useState({
+        fullname: '',
         email: '',
-        mobile: '',
+        mobile: ''
+    })
+    const [isAddress, setIsAddress] = useState(false)
+
+    const [addressForm, setAddressForm] = useState({
+        address: '',
+        city: '',
+        state: '',
+        country: '',
+        pincode: '',
+        userId: ''
     })
 
-    useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
+    useEffect(()=>{
+        onAuthStateChanged(auth, (user)=>{
+            if(user)
+            {
                 setSession(user)
-            } else {
+            }
+            else {
                 setSession(false)
                 navigate('/login')
             }
         })
     }, [])
 
-
     useEffect(()=>{
-        if(session)
-        {
-            setFormvalue({
-                ...formvalue,
-                fullname:session.displayName,
-                mobile:(session.phoneNumber?session.phoneNumber:'')
-            })
-        }
-    },[session])
+        const req = async ()=>{
+            if(session)
+            {
+                setFormValue({
+                    ...formValue,
+                    fullname: session.displayName,
+                    mobile: (session.phoneNumber ? session.phoneNumber : '')
+                })
+    
+                setAddressForm({
+                    ...addressForm,
+                    userId: session.uid
+                })
+    
+                // fetch address
+                const col = collection(db, "addresses")
+                const q = query(col, where("userId", "==", session.uid))
+                const snapshot = await getDocs(q)
+                
+                setIsAddress(!snapshot.empty)
 
-    const handleProfilePicture = async (e) => {
+                snapshot.forEach((doc)=>{
+                    const address = doc.data()
+                    setAddressForm({
+                        ...addressForm,
+                        ...address
+                    })
+                })
+            }
+        }
+        req()
+    }, [session])
+
+    const setProfilePicture = async (e)=>{
         const input = e.target
         const file = input.files[0]
-        const filenamearray = file.name.split(".")
-        const ext = filenamearray[filenamearray.length - 1]
-        const filename = Date.now() + '.' + ext
-        const bucket = ref(storage, `pictures/${filename}`)
+        const filenameArray = file.name.split(".")
+        const ext = filenameArray[filenameArray.length-1]
+        const filename = Date.now()+'.'+ext
+        const path = `pictures/${filename}`
+        const bucket = ref(storage, path)
         setUploading(true)
         const snapshot = await uploadBytes(bucket, file)
         const url = await getDownloadURL(snapshot.ref)
         await updateProfile(auth.currentUser,{
-            photoURL:url
+            photoURL: url
         })
         setUploading(false)
         setSession({
             ...session,
-            photoURL:url
+            photoURL: url
         })
     }
 
-    const handleFormValue = (e) => {
+    const handleFormValue = (e)=>{
         const input = e.target
         const name = input.name
         const value = input.value
-        setFormvalue({
-            ...formvalue,
+        setFormValue({
+            ...formValue,
             [name]: value
         })
     }
 
-
-    const saveProfileInfo = async(e) =>{
+    const saveProfileInfo = async (e)=>{
         e.preventDefault()
-        await updateProfile(auth.currentUser,{
-            displayName:formvalue.fullname,
-            phoneNumber:formvalue.mobile 
-        })
-
-        new Swal({
-            icon:'success',
-            title:'Profile Saved !'
-        })
         
+        await updateProfile(auth.currentUser, {
+            displayName: formValue.fullname,
+            phoneNumber: formValue.mobile
+        })
+        new Swal({
+            icon: 'success',
+            title: 'Profile Saved !'
+        })
     }
 
-
-    const setAddress=(e)=>
-    {
-        e.preventDefault()
+    const setAddress = async (e)=>{
+        try {
+            e.preventDefault()
+            await addDoc(collection(db, "addresses"), addressForm)
+            new Swal({
+                icon: 'success',
+                title: 'Address Saved !'
+            })
+        }
+        catch(err)
+        {
+            new Swal({
+                icon: 'error',
+                title: 'Failed !',
+                text: err.message
+            })
+        }
     }
 
+    const updateAddress = async (e)=>{
+        try {
+            e.preventDefault()
+            alert()
+        }
+        catch(err)
+        {
+            new Swal({
+                icon: 'error',
+                title: 'Failed !',
+                text: err.message
+            })
+        }
+    }
 
-    if (session == null)
-        return (
-            <div className="bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 h-full fixed top-0 left-0 w-full flex flex-col items-center justify-center">
-                <svg className="animate-spin h-10 w-10 text-rose-600 mb-4" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                </svg>
-                <p className="text-rose-600 text-lg font-semibold">Loading...</p>
-            </div>
-        )
+    const handleAddressForm = (e)=>{
+        const input = e.target
+        const name = input.name
+        const value = input.value
+        setAddressForm({
+            ...addressForm,
+            [name]: value
+        })
+    }
+
+    if(session === null)
+    return (
+        <div className="bg-gray-100 h-full fixed top-0 left-0 w-full flex justify-center items-center">
+            <span className="relative flex h-6 w-6">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-6 w-6 bg-sky-500"></span>
+            </span>
+        </div>
+    )
+    
 
     return (
         <Layout>
-            <div className="mx-auto md:my-16 shadow-lg rounded-md p-8 md:w-7/12 border">
-                <div className="flex gap-3">
+            <div className='mx-auto md:my-16 shadow-lg rounded-md p-8 md:w-7/12 border'>
+                <div className='flex gap-3'>
                     <i className="ri-user-line text-4xl"></i>
                     <h1 className="text-3xl font-semibold">Profile</h1>
                 </div>
-                <hr className="my-6" />
-                <div className="w-24 mx-auto relative mb-6">
-                    {
-                        uploading?
-                        
-                        <img src="/images/loader.gif" alt="" /> :
 
-                        <img src={session.photoURL?session.photoURL : "/images/avtar.png"} alt="Profile" className="rounded-full w-24 h-24" />
+                <hr className='my-6' />
+
+                <div className='w-24 h-24 mx-auto relative mb-6'>
+                    {
+                        uploading ? 
+                        <img src="/images/loader.gif" />
+                        :
+                        <img src={session.photoURL ? session.photoURL : "/images/avt.avif"} className='rounded-full w-24 h-24'/>
                     }
-                    <input type="file" accept="image/*" className="opacity-0 absolute top-0 left-0 w-full h-full z-10" onChange={handleProfilePicture} />
+                    <input type="file" accept="image/*" className='opacity-0 absolute top-0 left-0 w-full h-full' onChange={setProfilePicture} />
                 </div>
 
-                <form action="" className="grid grid-cols-2 gap-6" onSubmit={saveProfileInfo}>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="" className="text-lg font-semibold">Fullname</label>
-                        <input
+                <form className='grid grid-cols-2 gap-6' onSubmit={saveProfileInfo}>
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-lg font-semibold'>Fullname</label>
+
+                        <input 
                             onChange={handleFormValue}
-                            required type="text" name="fullname" className="p-2 rounded border border-gray-300"
-                            value={formvalue.fullname} />
+                            required
+                            name="fullname"
+                            className='p-2 rounded border border-gray-300'
+                            value={formValue.fullname}
+                        />
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="" className="text-lg font-semibold">Email</label>
-                        <input
+
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-lg font-semibold'>Email</label>
+                        <input 
                             disabled
                             onChange={handleFormValue}
-                            required type="email" name="email" className="p-2 rounded border border-gray-300"
-                            value={session.email || formvalue.email} />
+                            required
+                            name="email"
+                            type="email"
+                            className='p-2 rounded border border-gray-300'
+                            value={session.email}
+                        />
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="" className="text-lg font-semibold">Mobile</label>
-                        <input
+
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-lg font-semibold'>Mobile</label>
+                        <input 
                             onChange={handleFormValue}
-                            required type="number" name="mobile" className="p-2 rounded border border-gray-300"
-                            value={formvalue.mobile} />
+                            required
+                            name="mobile"
+                            type="number"
+                            className='p-2 rounded border border-gray-300'
+                            value={formValue.mobile}
+                        />
                     </div>
+
                     <div />
-                  
-                    <button className="px-4 py-2 bg-rose-600 text-white rounded w-fit col-span-2 hover:bg-green-500">
+
+                    <button className='px-4 py-2 bg-rose-600 text-white rounded w-fit hover:bg-green-600'>
                         <i className="ri-save-line mr-2"></i>
                         Save
                     </button>
                 </form>
             </div>
 
-
-            <div className="mx-auto md:my-16 shadow-lg rounded-md p-8 md:w-7/12 border">
-                <div className="flex gap-3">
-                    <i className="ri-truck-line text-4xl"></i>
+            <div className='mx-auto md:my-16 shadow-lg rounded-md p-8 md:w-7/12 border'>
+                <div className='flex gap-3'>
+                    <i className="ri-link-unlink-m text-4xl"></i>
                     <h1 className="text-3xl font-semibold">Delivery Address</h1>
                 </div>
-                <hr className="my-6" />
-               
 
-                <form action="" className="grid grid-cols-2 gap-6" onSubmit={setAddress}>
-                <div className="flex flex-col gap-2 col-span-2">
-                    <label htmlFor="" className="text-lg font-semibold">Area/Street/Village</label>
-                    <input
-                        onChange={handleFormValue}
-                        required type="text" name="address" className="p-2 rounded border border-gray-300"
-                        value={formvalue.address} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                    <label htmlFor="" className="text-lg font-semibold">City</label>
-                    <input
-                        onChange={handleFormValue}
-                        required type="text" name="city" className="p-2 rounded border border-gray-300"
-                        value={formvalue.city} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                    <label htmlFor="" className="text-lg font-semibold">State</label>
-                    <input
-                        onChange={handleFormValue}
-                        required type="text" name="state" className="p-2 rounded border border-gray-300"
-                        value={formvalue.state} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                    <label htmlFor="" className="text-lg font-semibold">Country</label>
-                    <input
-                        onChange={handleFormValue}
-                        required type="text" name="country" className="p-2 rounded border border-gray-300"
-                        value={formvalue.country} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                    <label htmlFor="" className="text-lg font-semibold">Pincode</label>
-                    <input
-                        onChange={handleFormValue}
-                        required type="number" name="pincode" className="p-2 rounded border border-gray-300"
-                        value={formvalue.pincode} />
+                <hr className='my-6' />
+
+                <form className='grid grid-cols-2 gap-6' onSubmit={isAddress ? updateAddress : setAddress}>
+                    <div className='flex flex-col gap-2 col-span-2'>
+                        <label className='text-lg font-semibold'>Area/Street/Vill</label>
+                        <input
+                            onChange={handleAddressForm} 
+                            required
+                            name="address"
+                            type="text"
+                            className='p-2 rounded border border-gray-300'
+                            value={addressForm.address}
+                        />
                     </div>
 
-                    <button className="px-4 py-2 bg-rose-600 text-white rounded w-fit col-span-2 hover:bg-green-500">
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-lg font-semibold'>City</label>
+                        <input 
+                            onChange={handleAddressForm} 
+                            required
+                            name="city"
+                            type="text"
+                            className='p-2 rounded border border-gray-300'
+                            value={addressForm.city}
+                        />
+                    </div>
+
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-lg font-semibold'>State</label>
+                        <input 
+                            onChange={handleAddressForm} 
+                            required
+                            name="state"
+                            type="text"
+                            className='p-2 rounded border border-gray-300'
+                            value={addressForm.state}
+                        />
+                    </div>
+
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-lg font-semibold'>Country</label>
+                        <input 
+                            onChange={handleAddressForm} 
+                            required
+                            name="country"
+                            type="text"
+                            className='p-2 rounded border border-gray-300'
+                            value={addressForm.country}
+                        />
+                    </div>
+
+                    <div className='flex flex-col gap-2'>
+                        <label className='text-lg font-semibold'>Pincode</label>
+                        <input 
+                            onChange={handleAddressForm} 
+                            required
+                            name="pincode"
+                            type="number"
+                            className='p-2 rounded border border-gray-300'
+                            value={addressForm.pincode}
+                        />
+                    </div>
+
+                    <button className='px-4 py-2 bg-rose-600 text-white rounded w-fit hover:bg-green-600'>
                         <i className="ri-save-line mr-2"></i>
                         Save
                     </button>
-
                 </form>
             </div>
         </Layout>
@@ -215,15 +324,3 @@ const Profile = () => {
 }
 
 export default Profile
-
-
-
-
-
-
-
-
-
-
-
-
