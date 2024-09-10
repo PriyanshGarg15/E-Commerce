@@ -1,4 +1,9 @@
 # React + Vite
+![image](https://github.com/user-attachments/assets/14eb7e04-7e32-4145-bb1b-b92f69697b9e)
+
+Authentication using firebase :-
+![image](https://github.com/user-attachments/assets/ae27da86-0fd5-46d1-bbd1-d6de6bff3da6)
+
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
