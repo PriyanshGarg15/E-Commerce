@@ -151,6 +151,7 @@ const Profile = ()=>{
             new Swal({
                 icon: 'error',
                 title: 'Failed !',
+                
                 text: err.message
             })
         }
